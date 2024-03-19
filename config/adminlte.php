@@ -257,7 +257,7 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'home',
+    'dashboard_url' => '/',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
@@ -316,9 +316,19 @@ return [
             'can' => 'manage-blog',
         ],
         [
-            'text' => 'kategori',
+            'text' => 'Kategori',
             'url' => 'kategori',
-            'icon' => 'bi bi-ui-checks-grid'
+            'icon' => 'fas fa-th-large'
+        ],
+        [
+            'text' => 'User',
+            'url' => 'user',
+            'icon' => 'fas fa-fw fa-user',
+        ],
+        [
+            'text' => 'Level',
+            'url' => 'level',
+            'icon' => 'fas fa-fw fa-user-cog',
         ],
         ['header' => 'account_settings'],
         [
