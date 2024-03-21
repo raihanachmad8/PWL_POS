@@ -25,12 +25,23 @@ class UserController extends Controller
     }
 
     public function tambah_simpan(Request $request) {
-        UserModel::create([
-            'username' => $request->username,
-            'nama' => $request->nama,
-            'password' => Hash::make($request->password),
-            'level_id' => $request->level_id
+        // UserModel::create([
+        //     'username' => $request->username,
+        //     'nama' => $request->nama,
+        //     'password' => Hash::make($request->password),
+        //     'level_id' => $request->level_id
+        // ]);
+
+        $validate = $request->validate([
+            'nama' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'unique:m_user', 'min:5'],
+            'password' => ['required', 'string', 'min:8'],
+            'level_id' => ['required', 'integer'],
         ]);
+
+        $validate['password'] = Hash::make($validate['password']);
+
+        UserModel::create($validate);
 
         return redirect('/user');
     }
