@@ -14,4 +14,5 @@ class LevelModel extends Model
     public function user() {
         return $this->hasMany(UserModel::class, 'level_id', 'level_id');
     }
+
 }

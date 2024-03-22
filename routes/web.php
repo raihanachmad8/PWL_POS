@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LevelController;
+use App\Http\Controllers\POSController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,3 +36,5 @@ Route::post('/user/hapus/{id}', [UserController::class, 'hapus'])->name('/user/h
 Route::post('/user/tambah_simpan', [UserController::class, 'tambah_simpan'])->name('/user/tambah_simpan');
 Route::put('/user/ubah_simpan', [UserController::class, 'ubah_simpan'])->name('/user/ubah_simpan');
 
+
+Route::resource('m_user', POSController::class);
