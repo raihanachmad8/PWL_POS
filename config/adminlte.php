@@ -330,6 +330,11 @@ return [
             'url' => 'level',
             'icon' => 'fas fa-fw fa-user-cog',
         ],
+        [
+            'text' => 'M User',
+            'url' => 'm_user',
+            'icon' => 'fas fa-fw fa-user',
+        ],
         ['header' => 'account_settings'],
         [
             'text' => 'profile',

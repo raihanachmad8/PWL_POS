@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LevelModel;
 use App\Models\m_user;
 use Illuminate\Http\Request;
 
@@ -21,7 +22,8 @@ class POSController extends Controller
      */
     public function create()
     {
-        return view('m_user.create');
+        $levels = LevelModel::all();
+        return view('m_user.create')->with('levels', $levels);
     }
 
     /**
@@ -35,9 +37,6 @@ class POSController extends Controller
             'nama' => 'required'
         ]);
 
-        if (!$request['level_id']) {
-            $request['level_id'] = 4;
-        }
 
         m_user::create($request->all());
 
@@ -60,8 +59,9 @@ class POSController extends Controller
      */
     public function edit(string $id)
     {
-        $useri = m_user::find($id);
-        return view('m_user.edit', compact('useri'));
+        $useri = m_user::with('level')->find($id);
+        $levels = LevelModel::all();
+        return view('m_user.edit', compact('useri'))->with('levels', $levels);
 
     }
 
