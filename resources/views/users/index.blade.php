@@ -1,57 +1,77 @@
-@extends('adminlte::page')
-@section('title', 'User')
-@section('content_header')
-    <h1>User</h1>
-@stop
+@extends('layouts.template')
 @section('content')
-
-    <div class="card card-primary">
+    <div class="card card-outline card-primary">
         <div class="card-header">
-            <h3 class="card-title">Tambah Data</h3>
+            <h3 class="card-title">{{ $page->title }}</h3>
+            <div class="card-tools">
+                <a class="btn btn-sm btn-primary mt-1" href="{{ url('user/create') }}">Tambah</a>
+            </div>
         </div>
-        <!-- /.card-header -->
         <div class="card-body">
-            <form>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <!-- text input -->
-                        <div class="form-group">
-                            <label>Username</label>
-                            <input type="text" class="form-control" placeholder="Enter username ...">
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <!-- text input -->
-                        <div class="form-group">
-                            <label>Nama</label>
-                            <input type="text" class="form-control" placeholder="Enter nama ...">
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <!-- text input -->
-                        <div class="form-group">
-                            <label>Password</label>
-                            <input type="password" class="form-control" placeholder="Enter password ...">
-                        </div>
-                    </div>
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
                 </div>
-                <div class="card-footer">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
                 </div>
-
-            </form>
+            @endif
+            <table class="table table-bordered table-striped table-hover table-sm" id="table_user">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Nama</th>
+                        <th>Level
+                            Pengguna</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
-        <!-- /.card-body -->
     </div>
-    <!-- /.card -->
-    <!-- general form elements disabled -->
-@stop
-@section('css')
-    {{-- Add here extra stylesheets --}}
-    {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
-@stop
-@section('js')
+@endsection
+@push('css')
+@endpush
+@push('js')
     <script>
-        console.log("Hi, I'm using the Laravel-AdminLTE package!");
+        $(document).ready(function() {
+            var dataUser = $('#table_user').DataTable({
+                serverSide: true, // serverSide: true, jika ingin menggunakan server side processing
+                ajax: {
+                    "url": "{{ url('user/list') }}",
+                    "dataType": "json",
+                    "type": "POST",
+                },
+                columns: [{
+                    data: "DT_RowIndex", // nomor urut dari laravel datatable addIndexColumn()
+                    className: "text-center",
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: "username",
+                    className: "",
+                    orderable: true, // orderable: true, jika ingin kolom ini bisa diurutkan
+                    searchable: true // searchable: true, jika ingin kolom ini bisa dicari
+                }, {
+                    data: "nama",
+                    className: "",
+                    orderable: true, // orderable: true, jika ingin kolom ini bisa diurutkan
+                    searchable: true // searchable: true, jika ingin kolom ini bisa dicari
+                }, {
+                    data: "level.level_nama",
+                    className: "",
+                    orderable: false, // orderable: true, jika ingin kolom ini bisa diurutkan
+                    searchable: false // searchable: true, jika ingin kolom ini bisa dicari
+                }, {
+                    data: "aksi",
+                    className: "",
+                    orderable: false, // orderable: true, jika ingin kolom ini bisa diurutkan
+                    searchable: false // searchable: true, jika ingin kolom ini bisa dicari
+                }]
+            });
+        });
     </script>
-@stop
+@endpush

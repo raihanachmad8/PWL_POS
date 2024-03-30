@@ -28,12 +28,15 @@ Route::get('/kategori/edit/{id}', [KategoriController::class, 'edit']);
 Route::put('/kategori/edit/{id}', [KategoriController::class, 'update']);
 Route::get('/kategori/delete/{id}', [KategoriController::class, 'destroy']);
 
-Route::get('/user', [UserController::class, 'index'])->name('/user');
-Route::get('/user/tambah', [UserController::class, 'tambah'])->name('/user/tambah');
-Route::post('/user/ubah/{id}', [UserController::class, 'ubah'])->name('/user/ubah');
-Route::post('/user/hapus/{id}', [UserController::class, 'hapus'])->name('/user/hapus');
-Route::post('/user/tambah_simpan', [UserController::class, 'tambah_simpan'])->name('/user/tambah_simpan');
-Route::put('/user/ubah_simpan', [UserController::class, 'ubah_simpan'])->name('/user/ubah_simpan');
-
+Route::group(['prefix' => 'user'], function () {
+    Route::get('/', [UserController::class, 'index']);
+    Route::post('/list', [UserController::class, 'list']);
+    Route::get('/create', [UserController::class, 'create']);
+    Route::post('/', [UserController::class, 'store']);
+    Route::get('/{id}', [UserController::class, 'show']);
+    Route::get('/{id}/edit', [UserController::class, 'edit']);
+    Route::put('/{id}', [UserController::class, 'update']);
+    Route::delete('/{id}', [UserController::class, 'destroy']);
+});
 
 Route::resource('m_user', POSController::class);
