@@ -20,14 +20,21 @@ class UserController extends Controller
             'title' => 'Daftar user yang terdaftar dalam sistem',
         ];
 
+        $level = LevelModel::all();
+
         $activeMenu = 'user';
-        return view('users.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'activeMenu' => $activeMenu]);
+        return view('users.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'level' => $level, 'activeMenu' => $activeMenu]);
     }
 
     public function list()
     {
         $users = UserModel::select('user_id', 'username', 'nama', 'level_id')
             ->with('level');
+
+        if (request()->level_id) {
+            $users->where('level_id', request()->level_id);
+        }
+        
 
             // dd($users->get());
         return datatables()->of($users)
