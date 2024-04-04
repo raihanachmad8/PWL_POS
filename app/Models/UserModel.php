@@ -18,4 +18,8 @@ class UserModel extends Model
     public function level() : BelongsTo {
         return $this->belongsTo(LevelModel::class, 'level_id', 'level_id');
     }
+
+    public function stok() {
+        return $this->hasMany(StokModel::class, 'user_id', 'user_id');
+    }
 }

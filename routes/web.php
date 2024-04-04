@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\BarangController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\POSController;
+use App\Http\Controllers\StokController;
+use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
@@ -20,13 +23,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [WelcomeController::class, 'index']);
 
-Route::get('/level', [LevelController::class, 'index']);
-Route::get('/kategori', [KategoriController::class, 'index']);
-Route::get('/kategori/create', [KategoriController::class, 'create']);
-Route::post('/kategori', [KategoriController::class, 'store']);
-Route::get('/kategori/edit/{id}', [KategoriController::class, 'edit']);
-Route::put('/kategori/edit/{id}', [KategoriController::class, 'update']);
-Route::get('/kategori/delete/{id}', [KategoriController::class, 'destroy']);
+// Route::get('/level', [LevelController::class, 'index']);
+// Route::get('/kategori', [KategoriController::class, 'index']);
+// Route::get('/kategori/create', [KategoriController::class, 'create']);
+// Route::post('/kategori', [KategoriController::class, 'store']);
+// Route::get('/kategori/edit/{id}', [KategoriController::class, 'edit']);
+// Route::put('/kategori/edit/{id}', [KategoriController::class, 'update']);
+// Route::get('/kategori/delete/{id}', [KategoriController::class, 'destroy']);
 
 Route::group(['prefix' => 'user'], function () {
     Route::get('/', [UserController::class, 'index']);
@@ -39,4 +42,14 @@ Route::group(['prefix' => 'user'], function () {
     Route::delete('/{id}', [UserController::class, 'destroy']);
 });
 
-Route::resource('m_user', POSController::class);
+// Route::resource('m_user', POSController::class);
+Route::resource('level', LevelController::class);
+Route::post('level/list', [LevelController::class, 'list']);
+Route::resource('kategori', KategoriController::class);
+Route::post('kategori/list', [KategoriController::class, 'list']);
+Route::resource('barang', BarangController::class);
+Route::post('barang/list', [BarangController::class, 'list']);
+Route::resource('stok', StokController::class);
+Route::post('stok/list', [StokController::class, 'list']);
+Route::resource('transaksi', TransaksiController::class);
+Route::post('transaksi/list', [TransaksiController::class, 'list']);
