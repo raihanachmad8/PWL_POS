@@ -68,16 +68,16 @@ class TransaksiController extends Controller
 
         $user = UserModel::all();
         $barang = BarangModel::all();
-        $kodePenjualan = 'TRX'. PenjualanModel::count() + 1;
+        $kodePenjualan = 'TRX' . PenjualanModel::count() + 1;
 
 
         $today = Carbon::now()->format('Y-m-d');
         $activeMenu = 'penjualan';
-        return view('penjualan.create', ['breadcrumb' => $breadcrumb,'page' => $page, 'today' => $today, 'barang' => $barang, 'user' => $user, 'kodePenjualan' => $kodePenjualan, 'activeMenu' => $activeMenu]);
-
+        return view('penjualan.create', ['breadcrumb' => $breadcrumb, 'page' => $page, 'today' => $today, 'barang' => $barang, 'user' => $user, 'kodePenjualan' => $kodePenjualan, 'activeMenu' => $activeMenu]);
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
 
         $validator = Validator::make($request->only('user_id', 'pembeli', 'penjualan_kode', 'penjualan_tanggal', 'barang_id', 'jumlah', 'harga',), [
             'penjualan_kode' => ['required', 'max:50', 'unique:t_penjualan,penjualan_kode'],
@@ -106,44 +106,43 @@ class TransaksiController extends Controller
         $request['penjualan_tanggal'] = Carbon::createFromFormat('Y-m-d', $request->penjualan_tanggal)
             ->setTime(Carbon::now()->format('H'), Carbon::now()->format('i'), Carbon::now()->format('s'));
 
-            try {
+        try {
 
-                DB::beginTransaction();
+            DB::beginTransaction();
 
-                $penjualan = new PenjualanModel();
-                $penjualan->penjualan_kode = $request['penjualan_kode'];
-                $penjualan->penjualan_tanggal = $request['penjualan_tanggal'];
-                $penjualan->user_id = $request['user_id'];
-                $penjualan->pembeli = $request['pembeli'];
-                $penjualan->save();
+            $penjualan = new PenjualanModel();
+            $penjualan->penjualan_kode = $request['penjualan_kode'];
+            $penjualan->penjualan_tanggal = $request['penjualan_tanggal'];
+            $penjualan->user_id = $request['user_id'];
+            $penjualan->pembeli = $request['pembeli'];
+            $penjualan->save();
 
-                foreach ($request['barang_id'] as $key => $barang_id) {
-                    $detail = new PenjualanDetailModel();
-                    $detail->penjualan_id = $penjualan->penjualan_id;
-                    $detail->barang_id = $barang_id;
-                    $detail->jumlah = $request['jumlah'][$key];
-                    $detail->harga = $request['harga'][$key];
-                    $detail->save();
+            foreach ($request['barang_id'] as $key => $barang_id) {
+                $detail = new PenjualanDetailModel();
+                $detail->penjualan_id = $penjualan->penjualan_id;
+                $detail->barang_id = $barang_id;
+                $detail->jumlah = $request['jumlah'][$key];
+                $detail->harga = $request['harga'][$key];
+                $detail->save();
 
-                    $stok = StokModel::find($barang_id);
+                $stok = StokModel::find($barang_id);
 
-                    if ($stok->stok_jumlah < $request['jumlah'][$key]) {
-                        throw new Exception('Stok barang tidak mencukupi');
-                    }
-
-                    $stok->stok_jumlah= $stok->stok_jumlah- $request['jumlah'][$key];
-                    $stok->save();
+                if ($stok->stok_jumlah < $request['jumlah'][$key]) {
+                    throw new Exception('Stok barang tidak mencukupi');
                 }
 
-                DB::commit();
-
-                return redirect('/transaksi')->with('success', 'Data transaksi berhasil ditambahkan');
-            } catch (Exception $e) {
-                DB::rollback();
-
-                return redirect('/transaksi')->with('error', 'Data transaksi gagal ditambahkan');
+                $stok->stok_jumlah = $stok->stok_jumlah - $request['jumlah'][$key];
+                $stok->save();
             }
 
+            DB::commit();
+
+            return redirect('/transaksi')->with('success', 'Data transaksi berhasil ditambahkan');
+        } catch (Exception $e) {
+            DB::rollback();
+
+            return redirect('/transaksi')->with('error', 'Data transaksi gagal ditambahkan');
+        }
     }
 
     public function show($id)
@@ -180,7 +179,7 @@ class TransaksiController extends Controller
         $penjualan = PenjualanModel::find($id)->load('detail.barang');
 
         $activeMenu = 'penjualan';
-        return view('penjualan.edit', ['breadcrumb' => $breadcrumb, 'page' => $page, 'activeMenu' => $activeMenu, 'barang' => $barang, 'user' => $user, 'penjualan' => $penjualan] );
+        return view('penjualan.edit', ['breadcrumb' => $breadcrumb, 'page' => $page, 'activeMenu' => $activeMenu, 'barang' => $barang, 'user' => $user, 'penjualan' => $penjualan]);
     }
 
     public function update(Request $request, $id)
@@ -197,46 +196,60 @@ class TransaksiController extends Controller
 
         if ($validator->fails()) {
             return redirect('/transaksi/' . $id . '/edit')
-            ->withErrors($validator)
-            ->withInput()
-            ->with('error', 'Data penjualan gagal diubah terdapat kesalahan pada inputan');
-
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', 'Data penjualan gagal diubah terdapat kesalahan pada inputan');
         }
         $request['penjualan_tanggal'] = Carbon::createFromFormat('Y-m-d', $request->penjualan_tanggal)
             ->setTime(Carbon::now()->format('H'), Carbon::now()->format('i'), Carbon::now()->format('s'));
 
         try {
+
             DB::beginTransaction();
 
             $penjualan = PenjualanModel::find($id);
             $penjualan->update($request->only(['pembeli', 'penjualan_kode', 'penjualan_tanggal']));
 
-
+            // Menghitung perubahan stok untuk setiap barang dalam transaksi
             foreach ($request['barang_id'] as $key => $barang_id) {
-                $detail = new PenjualanDetailModel();
-                $detail->penjualan_id = $penjualan->penjualan_id;
-                $detail->barang_id = $barang_id;
-                $detail->jumlah = $request['jumlah'][$key];
-                $detail->harga = $request['harga'][$key];
-                $detail->save();
+                $detail = PenjualanDetailModel::where('penjualan_id', $id)->where('barang_id', $barang_id)->first();
+                $oldQuantity = $penjualan->detail->where('barang_id', $barang_id)->where('penjualan_id', $id)->first()->jumlah;
 
-                $stok = StokModel::with(['barang'])->find($barang_id);
-
-                if ($stok->stok_jumlah < $request['jumlah'][$key]) {
-                    throw new Exception('Stok barang tidak mencukupi');
+                if ($detail) {
+                    // Jika detail penjualan ditemukan, update nilai-nilainya
+                    $detail->jumlah = $request['jumlah'][$key];
+                    $detail->harga = $request['harga'][$key];
+                    $detail->save();
+                } else {
+                    // Jika detail penjualan tidak ditemukan, tambahkan detail baru
+                    $newDetail = new PenjualanDetailModel();
+                    $newDetail->penjualan_id = $penjualan->penjualan_id;
+                    $newDetail->barang_id = $barang_id;
+                    $newDetail->jumlah = $request['jumlah'][$key];
+                    $newDetail->harga = $request['harga'][$key];
+                    $newDetail->save();
                 }
 
 
-                $stok->stok_jumlah = $stok->stok_jumlah + $penjualan->detail->where('barang_id', $barang_id)->where('penjualan_id', $id)->jumlah - $request['jumlah'][$key];
-                // dd($stok->stok_jumlah);
-                $stok->save();
+                $stok = StokModel::with(['barang'])->find($barang_id);
 
+
+                $newQuantity = $request['jumlah'][$key];
+                $quantityDifference = $oldQuantity - $newQuantity;
+
+                // Memperbarui stok barang
+                $stok->stok_jumlah += $quantityDifference;
+
+                if ($stok->stok_jumlah < 0) {
+                    throw new Exception('Stok barang tidak mencukupi');
+                }
+
+                $stok->save();
             }
 
             DB::commit();
             return redirect('/transaksi')->with('success', 'Data transaksi berhasil diubah');
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             DB::rollback();
             return redirect('/transaksi')->with('error', 'Data transaksi gagal diubah');
         }
@@ -253,15 +266,28 @@ class TransaksiController extends Controller
         try {
             DB::beginTransaction();
 
-            $penjualan->delete();
+            // Ambil semua detail transaksi yang terhubung dengan transaksi yang akan dihapus
+            $penjualanDetails = PenjualanDetailModel::where('penjualan_id', $id)->get();
+
+            // Kembalikan semua stok untuk setiap detail transaksi yang dihapus
+            foreach ($penjualanDetails as $detail) {
+                $stok = StokModel::find($detail->barang_id);
+                $stok->stok_jumlah += $detail->jumlah;
+                $stok->save();
+            }
+
+            // Hapus detail transaksi
             PenjualanDetailModel::where('penjualan_id', $id)->delete();
-            return redirect('/transaksi')->with('success', 'Data transaksi berhasil dihapus');
+
+            // Hapus transaksi
+            $penjualan->delete();
 
             DB::commit();
-        }  catch (\Illuminate\Database\QueryException $e) {
+
+            return redirect('/transaksi')->with('success', 'Data transaksi berhasil dihapus');
+        } catch (\Illuminate\Database\QueryException $e) {
             DB::rollBack();
-            return redirect('/barang')->with('error', 'Data barang gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini');
+            return redirect('/transaksi')->with('error', 'Data barang gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini');
         }
     }
-
 }
