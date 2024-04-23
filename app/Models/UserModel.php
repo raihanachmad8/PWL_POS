@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class UserModel extends Authenticatable
+class UserModel extends Model implements Authenticatable, JWTSubject
 {
     use HasFactory;
 
@@ -21,5 +23,46 @@ class UserModel extends Authenticatable
 
     public function stok() {
         return $this->hasMany(StokModel::class, 'user_id', 'user_id');
+    }
+
+    public function getAuthIdentifierName()
+    {
+        return 'user_id';
+    }
+
+    public function getAuthIdentifier()
+    {
+        return $this->user_id;
+    }
+
+    public function getAuthPassword()
+    {
+        return $this->password;
+    }
+
+    public function getRememberToken()
+    {
+        return $this->remember_token;
+    }
+
+    public function setRememberToken($value)
+    {
+        $this->remember_token = $value;
+    }
+
+    public function getRememberTokenName()
+    {
+        return 'remember_token';
+    }
+
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
     }
 }
