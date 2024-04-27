@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\BarangController as ApiBarangController;
+use App\Http\Controllers\Api\KategoriController;
 use App\Http\Controllers\Api\LevelController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\LogoutController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\RegisterController;
 use Illuminate\Http\Request;
@@ -37,4 +40,6 @@ Route::get('levels/{level}', [LevelController::class, 'show']);
 Route::put('levels/{level}', [LevelController::class, 'update']);
 Route::delete('levels/{level}', [LevelController::class, 'destroy']);
 
-
+Route::resource('user', UserController::class)->except(['create', 'edit']);
+Route::resource('kategori', KategoriController::class)->except(['create', 'edit']);
+Route::resource('barangs', ApiBarangController::class)->except(['create', 'edit']);
