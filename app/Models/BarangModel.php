@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,6 +20,7 @@ class BarangModel extends Model
         'barang_nama',
         'harga_beli',
         'harga_jual',
+        'image'
     ];
 
     protected $casts = [
@@ -36,7 +38,10 @@ class BarangModel extends Model
         return $this->hasMany(StokModel::class, 'barang_id', 'barang_id');
     }
 
-
-
+    public function image() : Attribute  {
+        return Attribute::make(
+            get: fn($image) => url('/storage/image/' .$image),
+        );
+    }
 
 }

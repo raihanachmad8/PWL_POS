@@ -31,7 +31,8 @@ class BarangController extends Controller
             'barang_kode' => 'required',
             'barang_nama' => 'required',
             'harga_beli' => 'required',
-            'harga_jual' => 'required'
+            'harga_jual' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ]);
 
         if ($validator->fails()) {
@@ -41,7 +42,15 @@ class BarangController extends Controller
                 'error' => $validator->errors()
             ]);
         }
-        $barang = BarangModel::create($request->all());
+        $barang = BarangModel::create([
+            'kategori_id' => $request->kategori_id,
+            'barang_kode' => $request->barang_kode,
+            'barang_nama' => $request->barang_nama,
+            'harga_beli' => $request->harga_beli,
+            'harga_jual' => $request->harga_jual,
+            'image' => $request->image->hashName()
+
+        ]);
         return response()->json([
             'code' => 201,
             'message' => 'Data created',
@@ -81,7 +90,8 @@ class BarangController extends Controller
             'barang_kode' => 'required',
             'barang_nama' => 'required',
             'harga_beli' => 'required',
-            'harga_jual' => 'required'
+            'harga_jual' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ]);
 
         if ($validator->fails()) {

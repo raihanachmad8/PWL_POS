@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\LogoutController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RegisterController;
+use App\Http\Controllers\Api\TransaksiController;
 use App\Http\Controllers\BarangController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -43,5 +44,6 @@ Route::delete('levels/{level}', [LevelController::class, 'destroy']);
 Route::resource('user', UserController::class)->except(['create', 'edit']);
 Route::resource('kategori', KategoriController::class)->except(['create', 'edit']);
 Route::resource('barangs', ApiBarangController::class)->except(['create', 'edit']);
+Route::resource('transaksi', TransaksiController::class)->except(['create', 'edit']);
 
 Route::post('/register1', RegisterController::class)->name('register1');
